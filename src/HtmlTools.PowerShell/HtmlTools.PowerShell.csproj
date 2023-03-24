@@ -1,9 +1,24 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>disable</ImplicitUsings>
+    <UseAppHost>False</UseAppHost>
+		<ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
+	<!-- https://github.com/jsakamoto/nupkg-selenium-webdriver-chromedriver/#how-to-include-the-driver-file-into-published-files -->
+	<PropertyGroup>
+		<PublishChromeDriver>true</PublishChromeDriver>
+	</PropertyGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.8.1" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="111.0.5563.6400" />
+		<PackageReference Include="System.Management.Automation" Version="7.0.0">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+  </ItemGroup>
+	
 </Project>
