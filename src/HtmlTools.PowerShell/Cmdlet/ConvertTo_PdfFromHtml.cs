@@ -134,6 +134,12 @@ namespace HtmlTools.PowerShell.Cmdlet {
 			ValueFromPipeline = false)]
 		public SwitchParameter AllowChromeDebugger { get; set; }
 
+		[Parameter(
+			ParameterSetName = "Default",
+			Mandatory = false,
+			ValueFromPipeline = false)]
+		public SwitchParameter NoOutput { get; set; }
+
 		protected override void ProcessRecord() {
 			
 			/* Get relevant file paths */
@@ -190,6 +196,10 @@ namespace HtmlTools.PowerShell.Cmdlet {
 					/* Write the PDF document */
 					File.WriteAllBytes(outputPath, pdf);
 				}
+			}
+
+			if (!NoOutput) {
+				WriteObject(new FileInfo(outputPath));
 			}
 		}
 
