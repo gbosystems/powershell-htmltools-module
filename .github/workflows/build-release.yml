@@ -1,0 +1,51 @@
+# SEE: https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/versioning
+# SEE: https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
+# SEE: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+name: Build Release
+on: workflow_dispatch
+#on:
+#    push:
+#        branches:
+#          - 'build-testing'
+env:
+    buildConfiguration: 'Release'
+    moduleName: 'HtmlTools'
+    guid: '563438AF-3DAF-4D71-AFD3-FA29E9B17C1D'
+    majorVersion: '0'
+    minorVersion: '1'
+    buildVersion: ${{ github.run_number }}
+    prerelease: ''
+    artifactName: 'module-archive'
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v3
+        - name: Setup dotnet
+          uses: actions/setup-dotnet@v3
+          with:
+            dotnet-version: '6.0.x'
+        - name: Build module
+          run: >
+            dotnet publish src/HtmlTools.PowerShell/HtmlTools.PowerShell.csproj 
+            --configuration ${{ env.buildConfiguration }} 
+            --output ${{ runner.temp }}/${{ env.moduleName }} 
+            --no-self-contained
+            /p:Version="${{ env.majorVersion }}.${{ env.minorVersion }}.${{ env.buildVersion }}.0"
+            /p:FileVersion="${{ env.majorVersion }}.${{ env.minorVersion }}.${{ env.buildVersion }}.0"
+            /p:AssemblyVersion="${{ env.majorVersion }}.0.0.0"
+            /p:InformationalVersion="${{ env.majorVersion }}.${{ env.minorVersion }}.${{ env.buildVersion }}.0+${{ github.sha }}"
+#        - name: Test Module
+#          run: dotnet test
+        - name: 'Create module manifest' 
+          shell: pwsh
+          run: >
+            ./src/create-module-manifest.ps1
+            -Path "${{ runner.temp }}/${{ env.moduleName }}"
+            -Prerelease "${{ env.prerelease }}"
+            -Guid "${{ env.guid }}"
+        - name: Upload module artifact
+          uses: actions/upload-artifact@v3
+          with:
+            name: ${{ env.artifactName }}
+            path: "${{ runner.temp }}/${{ env.moduleName }}/"

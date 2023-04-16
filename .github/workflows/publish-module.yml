@@ -1,0 +1,57 @@
+name: Publish Module
+on:
+  workflow_run:
+    workflows: ["Build Release"]
+    types:
+      - completed
+env:
+    moduleName: 'HtmlTools'
+    artifactName: 'module-archive'
+jobs:
+    publish:
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        runs-on: ubuntu-latest
+        permissions:
+          actions: read
+          packages: write
+        steps:
+          - name: Download artifact
+            uses: dawidd6/action-download-artifact@v2
+            with:
+              github_token: ${{ secrets.GITHUB_TOKEN }}
+              name: ${{ env.artifactName }}
+              path: ${{ runner.temp }}/${{ env.moduleName }} 
+              run_id: ${{ github.event.workflow_run.id }}
+              workflow: ${{ github.event.workflow_run.workflow_id }}
+              workflow_conclusion: success
+          - name: Publish module
+            shell: pwsh
+            run: |-
+              $user = "${{ github.actor }}"
+              $token = "${{ github.token }}" | ConvertTo-SecureString -AsPlainText -Force
+              $creds = New-Object System.Management.Automation.PSCredential -ArgumentList @($user, $token)
+              $feed = "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+              $moduleName = "${{ env.moduleName }}"
+              $repositoryName = "PowershellNugetServices"
+              
+              $dropPath = "${{ runner.temp }}"
+              $modulePath = [System.IO.Path]::GetFullPath((Join-Path -Path $dropPath -ChildPath $moduleName))
+              
+              ## Force TLS1.2
+              [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+              
+              ## Register repository
+              $registerArgs = @{
+                  Name = $repositoryName
+                  SourceLocation = $feed
+                  PublishLocation = $feed
+                  InstallationPolicy = 'Trusted'
+                  Credential = $creds
+              }
+              
+              Register-PSRepository @registerArgs
+              
+              ## Test
+               Get-PackageSource
+              
+              Publish-Module -Path $modulePath -Repository $repositoryName -NuGetApiKey "${{ secrets.GITHUB_TOKEN }}"           

@@ -13,7 +13,7 @@ if (-not (Test-Path -Path $Path -ErrorAction SilentlyContinue)){
     return;
 }
 
-$author = "Geoff O'Donnell"
+$author = "GBO Systems"
 $rootModule = "HtmlTools.PowerShell.dll"
 
 $name = Get-Item -Path $Path | Select -ExpandProperty Name
@@ -32,11 +32,11 @@ $newModuleManifestArgs = @{
     CompatiblePSEditions    = "Core"
     Description             = "PowerShell interface for various HTML tools"
     Guid                    = $Guid
-    LicenseUri              = "https://raw.githubusercontent.com/geoffodonnell/powershell-htmltools-module/main/LICENSE"
+    LicenseUri              = "https://raw.githubusercontent.com/gbosystems/powershell-htmltools-module/main/LICENSE"
     ModuleVersion           = $version
     Path                    = $modulePath
     PowerShellVersion       = "7.2" # Require .NET 6.0
-    ProjectUri              = "https://github.com/geoffodonnell/powershell-htmltools-module"
+    ProjectUri              = "https://github.com/gbosystems/powershell-htmltools-module"
     RootModule              = $rootModule
 }
 
