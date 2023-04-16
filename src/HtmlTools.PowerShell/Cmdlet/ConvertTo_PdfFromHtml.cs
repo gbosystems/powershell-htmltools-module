@@ -173,12 +173,12 @@ namespace HtmlTools.PowerShell.Cmdlet {
 				service.SuppressInitialDiagnosticInformation = true;
 
 				using (var driver = new ChromeDriver(service, options)) {
-	
-				/* Inject Javascript - Probably needs to be in a window.onload = function() { ... } to be useful */
-				if (!String.IsNullOrWhiteSpace(InjectJavascript)) {
+
+					/* Inject Javascript - Probably needs to be in a window.onload = function() { ... } to be useful */
+					if (!String.IsNullOrWhiteSpace(InjectJavascript)) {
 						driver.ExecuteCdpCommand(AddScriptCommandName, new Dictionary<string, object> {
-						{ AddScriptCommandSourceArg, InjectJavascript }
-					});
+							{ AddScriptCommandSourceArg, InjectJavascript }
+						});
 					}
 
 					/* Open page from dataURI */
